@@ -2,16 +2,16 @@ import { useSearchParams } from "react-router-dom";
 import useAsync from "../hooks/useAsync.js";
 import { api } from "../api.js";
 import ProductCard from "../components/ProductCard.jsx";
-import { useCart } from "../context/CartContext.jsx";
 
+// URL: /products?category=electronics&sort=price&search=phone
 export default function Products() {
   const [params, setParams] = useSearchParams();
-  const q = params.get("q") || "";
-  const category = params.get("categorie") || "";
-  const { add } = useCart();
+  const search = params.get("search") || "";
+  const category = params.get("category") || "";
+  const sort = params.get("sort") || "";
 
+  const { data, loading, error } = useAsync(() => api.getProducts(), []);
   const { data: categories } = useAsync(() => api.getCategories(), []);
-  const { data, loading, error } = useAsync(() => api.getProducts({ q, category }), [q, category]);
 
   const update = (key, value) => {
     const next = new URLSearchParams(params);
@@ -19,24 +19,37 @@ export default function Products() {
     setParams(next, { replace: true });
   };
 
+  let list = (data || []).filter(
+    (p) =>
+      (!category || p.category === category) &&
+      p.title.toLowerCase().includes(search.toLowerCase())
+  );
+  if (sort === "price") list = [...list].sort((a, b) => a.price - b.price);
+  if (sort === "price-desc") list = [...list].sort((a, b) => b.price - a.price);
+
   return (
     <>
-      <h2>Produse</h2>
+      <h2>Products</h2>
       <div className="bar">
-        <input placeholder="Cauta..." value={q} onChange={(e) => update("q", e.target.value)} />
-        <select value={category} onChange={(e) => update("categorie", e.target.value)}>
-          <option value="">Toate categoriile</option>
+        <input placeholder="Search..." value={search} onChange={(e) => update("search", e.target.value)} />
+        <select value={category} onChange={(e) => update("category", e.target.value)}>
+          <option value="">All categories</option>
           {(categories || []).map((c) => (
             <option key={c} value={c}>{c}</option>
           ))}
         </select>
+        <select value={sort} onChange={(e) => update("sort", e.target.value)}>
+          <option value="">Default order</option>
+          <option value="price">Price: low to high</option>
+          <option value="price-desc">Price: high to low</option>
+        </select>
       </div>
-      {loading && <p className="mut">Se incarca...</p>}
-      {error && <p className="err">{error}</p>}
-      {data && !data.length && <p className="mut">Niciun produs gasit.</p>}
+      {loading && <p className="mut">Loading...</p>}
+      {error && <p className="err">Unable to load products.</p>}
+      {data && !list.length && <p className="mut">No products found.</p>}
       <div className="grid">
-        {(data || []).map((p) => (
-          <ProductCard key={p.id} product={p} onAdd={add} />
+        {list.map((p) => (
+          <ProductCard key={p.id} product={p} />
         ))}
       </div>
     </>

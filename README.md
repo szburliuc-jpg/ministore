@@ -1,32 +1,22 @@
 # MiniStore
 
-Magazin mic cu React (Vite + react-router-dom) si API Express.
+Magazin mic cu React (Vite + react-router-dom). Datele vin de la https://fakestoreapi.com.
 
 ## Pornire
     npm install
     npm run dev
 
-- Frontend: http://localhost:5173
-- API: http://localhost:3001 (Vite face proxy pe /api)
-
-## Structura
-    server/index.js        API Express (produse, categorii, comenzi)
-    server/products.js     datele produselor
-    src/api.js             client pentru API
-    src/context/           cosul de cumparaturi (Context + localStorage)
-    src/hooks/useAsync.js  hook pentru incarcare/erori
-    src/components/        Header, ProductCard
-    src/pages/             Home, Products, ProductDetail, Cart, Checkout, NotFound
-
 ## Rute
-    /                 acasa
-    /produse          lista (filtre in query: ?q=...&categorie=...)
-    /produse/:id      detalii produs
-    /cos              cosul
-    /checkout         finalizare comanda
+    /                      Home
+    /products              lista (?category=electronics&sort=price&search=phone)
+    /products/:id          detalii produs
+    /about                 About
+    /dashboard             Overview (nested routes)
+    /dashboard/profile     Profile
+    /dashboard/settings    Settings
+    *                      404 + buton Home
 
-## Endpoint-uri API
-    GET  /api/products?q=&category=
-    GET  /api/categories
-    GET  /api/products/:id
-    POST /api/orders
+## API
+    GET https://fakestoreapi.com/products
+    GET https://fakestoreapi.com/products/{id}
+    GET https://fakestoreapi.com/products/categories

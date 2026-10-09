@@ -4,8 +4,8 @@ export default function NotFound() {
   return (
     <>
       <h2>404</h2>
-      <p className="mut">Pagina nu exista.</p>
-      <Link to="/">Acasa</Link>
+      <p className="mut">Page not found.</p>
+      <Link className="btn" to="/">Home</Link>
     </>
   );
 }

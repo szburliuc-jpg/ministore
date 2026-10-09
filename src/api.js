@@ -1,18 +1,16 @@
-async function request(url, options) {
-  const res = await fetch(url, {
-    headers: { "Content-Type": "application/json" },
-    ...options,
-  });
-  const data = await res.json().catch(() => ({}));
-  if (!res.ok) throw new Error(data.error || "Eroare de retea");
-  return data;
+const BASE = "https://fakestoreapi.com";
+
+async function request(path) {
+  const res = await fetch(BASE + path);
+  if (!res.ok) throw new Error("Request failed");
+  const text = await res.text();
+  // fakestoreapi intoarce 200 cu corp gol pentru id inexistent
+  if (!text) throw new Error("Not found");
+  return JSON.parse(text);
 }
 
 export const api = {
-  getProducts: ({ q = "", category = "" } = {}) =>
-    request(`/api/products?q=${encodeURIComponent(q)}&category=${encodeURIComponent(category)}`),
-  getCategories: () => request("/api/categories"),
-  getProduct: (id) => request(`/api/products/${id}`),
-  createOrder: (order) =>
-    request("/api/orders", { method: "POST", body: JSON.stringify(order) }),
+  getProducts: () => request("/products"),
+  getProduct: (id) => request(`/products/${encodeURIComponent(id)}`),
+  getCategories: () => request("/products/categories"),
 };

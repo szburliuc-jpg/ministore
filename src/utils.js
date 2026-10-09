@@ -1,1 +1,1 @@
-export const money = (n) => n.toLocaleString("ro-RO") + " lei";
+export const money = (n) => "$" + Number(n).toFixed(2);
